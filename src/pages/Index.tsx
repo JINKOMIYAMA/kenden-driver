@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import HeroSection from "../components/HeroSection";
 import RiskDiagram from "../components/RiskDiagram";
-import ProductCard from "../components/ProductCard";
+import ProductCard, { ProductCardProps } from "../components/ProductCard";
 import DriverFeatures from "../components/DriverFeatures";
 import { Shield, Zap, Battery, Factory, AlertCircle } from "lucide-react";
 import ShoeiLogo from "../assets/images/shoeilogo.jpg";
@@ -163,12 +163,18 @@ const Index = () => {
                 description="プラスドライバー型の検電ドライバー"
                 image={PlusDriver}
                 className="aspect-[4/3] object-contain"
+                buttons={[
+                  { label: "購入", variant: "primary" }
+                ]}
               />
               <ProductCard
                 title="見電ドライバー（－）"
                 description="マイナスドライバー型の検電ドライバー"
                 image={MinusDriver}
                 className="aspect-[4/3] object-contain"
+                buttons={[
+                  { label: "購入", variant: "primary" }
+                ]}
               />
             </div>
           </div>
@@ -193,23 +199,23 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <h4 className="text-2xl font-bold text-primary">株式会社昭栄電気産業</h4>
-                      <p className="text-lg text-gray-400">Shoei Electrical Industries Co., Ltd.</p>
+                      <h4 className="text-xl md:text-2xl font-bold text-primary">株式会社昭栄電気産業</h4>
+                      <p className="text-base md:text-lg text-gray-400">Shoei Electrical Industries Co., Ltd.</p>
                     </div>
                   </div>
                   
                   <div className="space-y-6 text-gray-300">
                     <div className="flex gap-4">
-                      <span className="text-lg font-medium text-primary">所在地</span>
-                      <span className="text-lg">〒125-0053 東京都葛飾区鎌倉3-58-2</span>
+                      <span className="text-sm md:text-lg font-medium text-primary">所在地</span>
+                      <span className="text-sm md:text-lg">〒125-0053 東京都葛飾区鎌倉3-58-2</span>
                     </div>
                     <div className="flex gap-4">
-                      <span className="text-lg font-medium text-primary">製造元</span>
-                      <span className="text-lg">株式会社ベッセル</span>
+                      <span className="text-sm md:text-lg font-medium text-primary">製造元</span>
+                      <span className="text-sm md:text-lg">株式会社ベッセル</span>
                     </div>
                     <div className="flex gap-4">
-                      <span className="text-lg font-medium text-primary">お問い合わせ</span>
-                      <span className="text-lg">shoei-buppan@shoeinet.com</span>
+                      <span className="text-sm md:text-lg font-medium text-primary">お問い合わせ</span>
+                      <span className="text-sm md:text-lg">shoei-buppan@shoeinet.com</span>
                     </div>
                   </div>
                 </div>
