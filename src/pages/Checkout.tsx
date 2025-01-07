@@ -84,14 +84,14 @@ const Checkout = () => {
             <div className="flex flex-row justify-between items-center gap-4">
               <button
                 onClick={() => navigate('/')}
-                className="text-blue-400 hover:text-blue-300 text-sm whitespace-nowrap"
+                className="text-blue-400 hover:text-blue-300 md:text-base text-sm whitespace-nowrap"
               >
                 ← 買い物を続ける
               </button>
 
               <button
                 onClick={handleProceedToPayment}
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded-full transition-colors text-sm whitespace-nowrap"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold md:py-3 md:px-8 py-2 px-4 rounded-full transition-colors md:text-base text-sm whitespace-nowrap"
               >
                 レジに進む
               </button>
