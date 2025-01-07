@@ -48,26 +48,21 @@ const Payment = () => {
 
   return (
     <div className="min-h-screen bg-dark p-6">
-      <div className="max-w-4xl mx-auto bg-gray-900/80 rounded-xl p-4 md:p-8">
+      <div className="max-w-3xl mx-auto bg-gray-900/80 rounded-xl p-4 md:p-8">
         <h2 className="text-2xl font-bold text-white mb-6">お支払い情報</h2>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-6">
-            <OrderSummary items={items} total={total} />
-            <CustomerInfo />
-          </div>
-          
-          <div className="space-y-6">
-            <DeliveryInfo 
-              address={address}
-              setAddress={setAddress}
-              handlePostalCodeChange={handlePostalCodeChange}
-            />
-            <PaymentMethod 
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-            />
-          </div>
+        <div className="space-y-6">
+          <OrderSummary items={items} total={total} />
+          <CustomerInfo />
+          <DeliveryInfo 
+            address={address}
+            setAddress={setAddress}
+            handlePostalCodeChange={handlePostalCodeChange}
+          />
+          <PaymentMethod 
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+          />
         </div>
 
         <div className="flex justify-between items-center mt-8">
