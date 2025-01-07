@@ -18,7 +18,7 @@ const CartIcon = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (location.pathname === '/checkout') {
+  if (location.pathname === '/checkout' || location.pathname === '/payment') {
     return null;
   }
 
@@ -41,4 +41,4 @@ const CartIcon = () => {
   );
 };
 
-export default CartIcon; 
+export default CartIcon;
