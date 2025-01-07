@@ -81,17 +81,17 @@ const Checkout = () => {
               <span>¥{total.toLocaleString()}</span>
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex flex-row justify-between items-center gap-4">
               <button
                 onClick={() => navigate('/')}
-                className="text-blue-400 hover:text-blue-300"
+                className="text-blue-400 hover:text-blue-300 text-sm whitespace-nowrap"
               >
                 ← 買い物を続ける
               </button>
 
               <button
                 onClick={handleProceedToPayment}
-                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-full transition-colors"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded-full transition-colors text-sm whitespace-nowrap"
               >
                 レジに進む
               </button>
@@ -103,4 +103,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout; 
+export default Checkout;
