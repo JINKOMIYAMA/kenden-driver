@@ -7,6 +7,7 @@ import { DeliveryInfo } from '../components/payment/DeliveryInfo';
 import { PaymentMethod } from '../components/payment/PaymentMethod';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { validatePaymentForm } from '../utils/paymentValidation';
 
 const Payment = () => {
   const { items, clearCart } = useCart();
@@ -49,93 +50,12 @@ const Payment = () => {
     }
   };
 
-  const validateForm = () => {
-    const errors: string[] = [];
-
-    // カートの商品チェック
-    if (items.length === 0) {
-      errors.push('カートに商品が入っていません');
-    }
-
-    // お客様情報のバリデーション
-    if (!customerInfo.name.trim()) {
-      errors.push('お名前を入力してください');
-    }
-    if (!customerInfo.email.trim()) {
-      errors.push('メールアドレスを入力してください');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
-      errors.push('有効なメールアドレスを入力してください');
-    }
-
-    // お届け先情報のバリデーション
-    if (!address.postalCode) {
-      errors.push('郵便番号を入力してください');
-    } else if (address.postalCode.length !== 7) {
-      errors.push('郵便番号は7桁で入力してください');
-    }
-    if (!address.prefecture.trim()) {
-      errors.push('都道府県を入力してください');
-    }
-    if (!address.city.trim()) {
-      errors.push('市区町村を入力してください');
-    }
-    if (!address.street.trim()) {
-      errors.push('番地・建物名を入力してください');
-    }
-
-    // 支払い方法に応じたバリデーション
-    if (paymentMethod === 'credit') {
-      const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement;
-      const expiryInput = document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement;
-      const cvvInput = document.querySelector('input[placeholder="123"]') as HTMLInputElement;
-      const nameInput = document.querySelector('input[placeholder="TARO YAMADA"]') as HTMLInputElement;
-
-      if (!cardNumberInput?.value) {
-        errors.push('クレジットカード番号を入力してください');
-      } else if (!/^\d{16}$/.test(cardNumberInput.value.replace(/\s/g, ''))) {
-        errors.push('有効なクレジットカード番号を入力してください');
-      }
-
-      if (!expiryInput?.value) {
-        errors.push('有効期限を入力してください');
-      } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryInput.value)) {
-        errors.push('有効期限は MM/YY の形式で入力してください');
-      }
-
-      if (!cvvInput?.value) {
-        errors.push('セキュリティコードを入力してください');
-      } else if (!/^\d{3}$/.test(cvvInput.value)) {
-        errors.push('セキュリティコードは3桁の数字で入力してください');
-      }
-
-      if (!nameInput?.value.trim()) {
-        errors.push('カード名義人を入力してください');
-      }
-    } else if (paymentMethod === 'bank') {
-      const nameInput = document.querySelector('input[placeholder="ヤマダタロウ"]') as HTMLInputElement;
-      const phoneInput = document.querySelector('input[placeholder="090-1234-5678"]') as HTMLInputElement;
-
-      if (!nameInput?.value.trim()) {
-        errors.push('お名前（カタカナ）を入力してください');
-      } else if (!/^[ァ-ヶー]+$/.test(nameInput.value)) {
-        errors.push('お名前はカタカナで入力してください');
-      }
-
-      if (!phoneInput?.value) {
-        errors.push('電話番号を入力してください');
-      } else if (!/^0\d{1,4}-\d{1,4}-\d{4}$/.test(phoneInput.value)) {
-        errors.push('有効な電話番号を入力してください（例：090-1234-5678）');
-      }
-    }
-
-    return errors;
-  };
-
   const handlePayment = async () => {
-    const validationErrors = validateForm();
+    const validationErrors = validatePaymentForm(items, customerInfo, address, paymentMethod);
     
-    if (validationErrors.length > 0) {
-      validationErrors.forEach(error => {
+    // エラーがある場合、すべてのエラーメッセージを表示
+    if (Object.keys(validationErrors).length > 0) {
+      Object.values(validationErrors).flat().forEach(error => {
         toast.error(error);
       });
       return;
