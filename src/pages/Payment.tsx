@@ -53,19 +53,33 @@ const Payment = () => {
 
     // Payment Method specific validation
     if (paymentMethod === 'credit') {
-      const creditFields = document.querySelectorAll('input[type="text"]');
-      creditFields.forEach(field => {
-        if ((field as HTMLInputElement).value.trim() === '') {
-          errors.push('クレジットカード情報をすべて入力してください');
-        }
-      });
+      const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement;
+      const expiryInput = document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement;
+      const cvvInput = document.querySelector('input[placeholder="123"]') as HTMLInputElement;
+      const nameInput = document.querySelector('input[placeholder="TARO YAMADA"]') as HTMLInputElement;
+
+      if (!cardNumberInput?.value.trim()) {
+        errors.push('カード番号を入力してください');
+      }
+      if (!expiryInput?.value.trim()) {
+        errors.push('有効期限を入力してください');
+      }
+      if (!cvvInput?.value.trim()) {
+        errors.push('セキュリティコードを入力してください');
+      }
+      if (!nameInput?.value.trim()) {
+        errors.push('カード名義人を入力してください');
+      }
     } else if (paymentMethod === 'bank') {
-      const bankFields = document.querySelectorAll('input[type="text"], input[type="tel"]');
-      bankFields.forEach(field => {
-        if ((field as HTMLInputElement).value.trim() === '') {
-          errors.push('振込人情報をすべて入力してください');
-        }
-      });
+      const nameInput = document.querySelector('input[placeholder="ヤマダタロウ"]') as HTMLInputElement;
+      const phoneInput = document.querySelector('input[placeholder="090-1234-5678"]') as HTMLInputElement;
+
+      if (!nameInput?.value.trim()) {
+        errors.push('お名前（カタカナ）を入力してください');
+      }
+      if (!phoneInput?.value.trim()) {
+        errors.push('電話番号を入力してください');
+      }
     }
 
     return errors;
