@@ -7,29 +7,48 @@ export const PaymentMethod = ({ paymentMethod, setPaymentMethod }: PaymentMethod
   return (
     <div className="bg-gray-800/50 p-4 rounded-lg">
       <h3 className="text-white font-medium mb-4">支払い方法</h3>
-      <div className="space-y-3">
-        <label className="flex items-center space-x-3">
-          <input 
-            type="radio" 
-            name="payment" 
-            value="credit"
-            checked={paymentMethod === 'credit'}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="form-radio text-yellow-500" 
-          />
-          <span className="text-gray-300">クレジットカード</span>
-        </label>
-        <label className="flex items-center space-x-3">
-          <input 
-            type="radio" 
-            name="payment" 
-            value="bank"
-            checked={paymentMethod === 'bank'}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="form-radio text-yellow-500" 
-          />
-          <span className="text-gray-300">銀行振込</span>
-        </label>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <label 
+            className={`flex flex-col items-center p-4 rounded-lg cursor-pointer border-2 transition-all
+              ${paymentMethod === 'credit' 
+                ? 'border-yellow-500 bg-gray-700/50' 
+                : 'border-gray-700 hover:border-gray-600'}`}
+          >
+            <input 
+              type="radio" 
+              name="payment" 
+              value="credit"
+              checked={paymentMethod === 'credit'}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="sr-only" 
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <span className="text-gray-300 font-medium">クレジットカード</span>
+          </label>
+
+          <label 
+            className={`flex flex-col items-center p-4 rounded-lg cursor-pointer border-2 transition-all
+              ${paymentMethod === 'bank' 
+                ? 'border-yellow-500 bg-gray-700/50' 
+                : 'border-gray-700 hover:border-gray-600'}`}
+          >
+            <input 
+              type="radio" 
+              name="payment" 
+              value="bank"
+              checked={paymentMethod === 'bank'}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="sr-only" 
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+            </svg>
+            <span className="text-gray-300 font-medium">銀行振込</span>
+          </label>
+        </div>
 
         {paymentMethod === 'credit' && (
           <div className="mt-4 space-y-4 pl-6 border-l-2 border-gray-700">
