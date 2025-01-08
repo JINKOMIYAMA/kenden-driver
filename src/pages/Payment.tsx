@@ -5,14 +5,8 @@ import { OrderSummary } from '../components/payment/OrderSummary';
 import { CustomerInfo } from '../components/payment/CustomerInfo';
 import { DeliveryInfo } from '../components/payment/DeliveryInfo';
 import { PaymentMethod } from '../components/payment/PaymentMethod';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-// Supabaseクライアントの初期化
-const supabase = createClient(
-  'https://your-project-url.supabase.co',  // ここを実際のSupabase URLに置き換える必要があります
-  'your-anon-key'  // ここを実際のAnon Keyに置き換える必要があります
-);
 
 const Payment = () => {
   const { items, clearCart } = useCart();
@@ -55,6 +49,16 @@ const Payment = () => {
 
   const handlePayment = async () => {
     try {
+      // バリデーション
+      if (!customerInfo.name || !customerInfo.email || !address.postalCode || 
+          !address.prefecture || !address.city || !address.street) {
+        toast.error('すべての必須項目を入力してください。');
+        return;
+      }
+
+      // 配送先住所の文字列を作成
+      const shippingAddress = `〒${address.postalCode} ${address.prefecture}${address.city}${address.street}`;
+
       // 注文情報をデータベースに保存
       const { data, error } = await supabase
         .from('orders')
@@ -64,14 +68,13 @@ const Payment = () => {
             customer_email: customerInfo.email,
             total_amount: total,
             payment_method: paymentMethod,
-            shipping_address: `${address.postalCode} ${address.prefecture}${address.city}${address.street}`,
+            shipping_address: shippingAddress,
             items: items.map(item => ({
               id: item.id,
               name: item.name,
               price: item.price,
               quantity: item.quantity
-            })),
-            status: 'pending'
+            }))
           }
         ])
         .select();
