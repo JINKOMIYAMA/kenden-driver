@@ -27,7 +27,7 @@ const Payment = () => {
   const validateForm = () => {
     const errors: string[] = [];
 
-    // Validate customer info
+    // Customer Info Validation
     if (!customerInfo.name.trim()) {
       errors.push('お名前を入力してください');
     }
@@ -37,7 +37,7 @@ const Payment = () => {
       errors.push('有効なメールアドレスを入力してください');
     }
 
-    // Validate delivery info
+    // Delivery Info Validation
     if (!address.postalCode) {
       errors.push('郵便番号を入力してください');
     }
@@ -51,7 +51,7 @@ const Payment = () => {
       errors.push('番地・建物名を入力してください');
     }
 
-    // Validate payment method specific fields
+    // Payment Method Validation
     if (paymentMethod === 'credit') {
       const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement;
       const expiryInput = document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement;
