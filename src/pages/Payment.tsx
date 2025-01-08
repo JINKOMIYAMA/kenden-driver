@@ -27,7 +27,7 @@ const Payment = () => {
   const validateForm = () => {
     const errors: string[] = [];
 
-    // Customer Info validation
+    // Validate customer info
     if (!customerInfo.name.trim()) {
       errors.push('お名前を入力してください');
     }
@@ -37,7 +37,7 @@ const Payment = () => {
       errors.push('有効なメールアドレスを入力してください');
     }
 
-    // Delivery Info validation
+    // Validate delivery info
     if (!address.postalCode) {
       errors.push('郵便番号を入力してください');
     }
@@ -51,33 +51,33 @@ const Payment = () => {
       errors.push('番地・建物名を入力してください');
     }
 
-    // Payment Method specific validation
+    // Validate payment method specific fields
     if (paymentMethod === 'credit') {
       const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement;
       const expiryInput = document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement;
       const cvvInput = document.querySelector('input[placeholder="123"]') as HTMLInputElement;
       const nameInput = document.querySelector('input[placeholder="TARO YAMADA"]') as HTMLInputElement;
 
-      if (!cardNumberInput?.value.trim()) {
+      if (!cardNumberInput?.value) {
         errors.push('カード番号を入力してください');
       }
-      if (!expiryInput?.value.trim()) {
+      if (!expiryInput?.value) {
         errors.push('有効期限を入力してください');
       }
-      if (!cvvInput?.value.trim()) {
+      if (!cvvInput?.value) {
         errors.push('セキュリティコードを入力してください');
       }
-      if (!nameInput?.value.trim()) {
+      if (!nameInput?.value) {
         errors.push('カード名義人を入力してください');
       }
     } else if (paymentMethod === 'bank') {
       const nameInput = document.querySelector('input[placeholder="ヤマダタロウ"]') as HTMLInputElement;
       const phoneInput = document.querySelector('input[placeholder="090-1234-5678"]') as HTMLInputElement;
 
-      if (!nameInput?.value.trim()) {
+      if (!nameInput?.value) {
         errors.push('お名前（カタカナ）を入力してください');
       }
-      if (!phoneInput?.value.trim()) {
+      if (!phoneInput?.value) {
         errors.push('電話番号を入力してください');
       }
     }
@@ -119,11 +119,9 @@ const Payment = () => {
     }
 
     try {
-      // 配送先住所の文字列を作成
       const shippingAddress = `〒${address.postalCode} ${address.prefecture}${address.city}${address.street}`;
 
-      // 注文情報をデータベースに保存
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('orders')
         .insert([
           {
@@ -139,12 +137,10 @@ const Payment = () => {
               quantity: item.quantity
             }))
           }
-        ])
-        .select();
+        ]);
 
       if (error) throw error;
 
-      // 注文完了後の処理
       toast.success('ご注文ありがとうございます！');
       clearCart();
       navigate('/');
