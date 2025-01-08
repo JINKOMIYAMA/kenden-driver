@@ -31,6 +31,50 @@ export const PaymentMethod = ({ paymentMethod, setPaymentMethod }: PaymentMethod
           <span className="text-gray-300">銀行振込</span>
         </label>
 
+        {paymentMethod === 'credit' && (
+          <div className="mt-4 space-y-4 pl-6 border-l-2 border-gray-700">
+            <div className="space-y-3">
+              <div>
+                <label className="block text-gray-300 text-sm mb-1">カード番号</label>
+                <input 
+                  type="text"
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={19}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">有効期限</label>
+                  <input 
+                    type="text"
+                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                    placeholder="MM/YY"
+                    maxLength={5}
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">セキュリティコード</label>
+                  <input 
+                    type="text"
+                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                    placeholder="123"
+                    maxLength={3}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-gray-300 text-sm mb-1">カード名義人（ローマ字）</label>
+                <input 
+                  type="text"
+                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                  placeholder="TARO YAMADA"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {paymentMethod === 'bank' && (
           <div className="mt-4 space-y-4 pl-6 border-l-2 border-gray-700">
             <div>
