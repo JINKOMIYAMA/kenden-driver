@@ -10,8 +10,8 @@ import { toast } from 'sonner';
 
 // Supabaseクライアントの初期化
 const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  'https://your-project-url.supabase.co',  // ここを実際のSupabase URLに置き換える必要があります
+  'your-anon-key'  // ここを実際のAnon Keyに置き換える必要があります
 );
 
 const Payment = () => {
