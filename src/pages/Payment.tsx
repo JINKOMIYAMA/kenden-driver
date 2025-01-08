@@ -24,6 +24,53 @@ const Payment = () => {
     street: ''
   });
 
+  const validateForm = () => {
+    const errors: string[] = [];
+
+    // Customer Info validation
+    if (!customerInfo.name.trim()) {
+      errors.push('お名前を入力してください');
+    }
+    if (!customerInfo.email.trim()) {
+      errors.push('メールアドレスを入力してください');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      errors.push('有効なメールアドレスを入力してください');
+    }
+
+    // Delivery Info validation
+    if (!address.postalCode) {
+      errors.push('郵便番号を入力してください');
+    }
+    if (!address.prefecture.trim()) {
+      errors.push('都道府県を入力してください');
+    }
+    if (!address.city.trim()) {
+      errors.push('市区町村を入力してください');
+    }
+    if (!address.street.trim()) {
+      errors.push('番地・建物名を入力してください');
+    }
+
+    // Payment Method specific validation
+    if (paymentMethod === 'credit') {
+      const creditFields = document.querySelectorAll('input[type="text"]');
+      creditFields.forEach(field => {
+        if ((field as HTMLInputElement).value.trim() === '') {
+          errors.push('クレジットカード情報をすべて入力してください');
+        }
+      });
+    } else if (paymentMethod === 'bank') {
+      const bankFields = document.querySelectorAll('input[type="text"], input[type="tel"]');
+      bankFields.forEach(field => {
+        if ((field as HTMLInputElement).value.trim() === '') {
+          errors.push('振込人情報をすべて入力してください');
+        }
+      });
+    }
+
+    return errors;
+  };
+
   const handlePostalCodeChange = async (code: string) => {
     setAddress(prev => ({ ...prev, postalCode: code }));
     
@@ -48,14 +95,16 @@ const Payment = () => {
   };
 
   const handlePayment = async () => {
-    try {
-      // バリデーション
-      if (!customerInfo.name || !customerInfo.email || !address.postalCode || 
-          !address.prefecture || !address.city || !address.street) {
-        toast.error('すべての必須項目を入力してください。');
-        return;
-      }
+    const validationErrors = validateForm();
+    
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(error => {
+        toast.error(error);
+      });
+      return;
+    }
 
+    try {
       // 配送先住所の文字列を作成
       const shippingAddress = `〒${address.postalCode} ${address.prefecture}${address.city}${address.street}`;
 
