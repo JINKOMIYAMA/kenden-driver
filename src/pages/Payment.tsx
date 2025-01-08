@@ -5,12 +5,24 @@ import { OrderSummary } from '../components/payment/OrderSummary';
 import { CustomerInfo } from '../components/payment/CustomerInfo';
 import { DeliveryInfo } from '../components/payment/DeliveryInfo';
 import { PaymentMethod } from '../components/payment/PaymentMethod';
+import { createClient } from '@supabase/supabase-js';
+import { toast } from 'sonner';
+
+// Supabaseクライアントの初期化
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 const Payment = () => {
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const navigate = useNavigate();
   const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const [paymentMethod, setPaymentMethod] = useState('credit');
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: ''
+  });
   const [address, setAddress] = useState({
     postalCode: '',
     prefecture: '',
@@ -41,9 +53,39 @@ const Payment = () => {
     }
   };
 
-  const handlePayment = () => {
-    alert('支払い処理が完了しました！');
-    navigate('/');
+  const handlePayment = async () => {
+    try {
+      // 注文情報をデータベースに保存
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            customer_name: customerInfo.name,
+            customer_email: customerInfo.email,
+            total_amount: total,
+            payment_method: paymentMethod,
+            shipping_address: `${address.postalCode} ${address.prefecture}${address.city}${address.street}`,
+            items: items.map(item => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity
+            })),
+            status: 'pending'
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      // 注文完了後の処理
+      toast.success('ご注文ありがとうございます！');
+      clearCart();
+      navigate('/');
+    } catch (error) {
+      console.error('注文処理に失敗しました:', error);
+      toast.error('注文処理に失敗しました。もう一度お試しください。');
+    }
   };
 
   return (
@@ -53,7 +95,10 @@ const Payment = () => {
 
         <div className="space-y-6">
           <OrderSummary items={items} total={total} />
-          <CustomerInfo />
+          <CustomerInfo 
+            customerInfo={customerInfo}
+            setCustomerInfo={setCustomerInfo}
+          />
           <DeliveryInfo 
             address={address}
             setAddress={setAddress}
