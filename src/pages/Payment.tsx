@@ -7,7 +7,13 @@ import { DeliveryInfo } from '../components/payment/DeliveryInfo';
 import { PaymentMethod } from '../components/payment/PaymentMethod';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { validatePaymentForm } from '../utils/paymentValidation';
+import { 
+  validateCart, 
+  validateCustomerInfo, 
+  validateAddress, 
+  validateCreditCard, 
+  validateBankTransfer 
+} from '../utils/validators';
 
 const Payment = () => {
   const { items, clearCart } = useCart();
@@ -51,107 +57,20 @@ const Payment = () => {
   };
 
   const handlePayment = async () => {
-    // カートが空の場合のチェック
-    if (items.length === 0) {
-      toast.error('カートに商品がありません');
-      return;
-    }
+    // カートの検証
+    if (!validateCart(items)) return;
 
-    // 顧客情報のバリデーション
-    if (!customerInfo.name.trim()) {
-      toast.error('お名前を入力してください');
-      return;
-    }
-    if (!customerInfo.email.trim()) {
-      toast.error('メールアドレスを入力してください');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
-      toast.error('有効なメールアドレスを入力してください');
-      return;
-    }
+    // 顧客情報の検証
+    if (!validateCustomerInfo(customerInfo)) return;
 
-    // 配送先情報のバリデーション
-    if (!address.postalCode) {
-      toast.error('郵便番号を入力してください');
-      return;
-    }
-    if (address.postalCode.length !== 7) {
-      toast.error('郵便番号は7桁で入力してください');
-      return;
-    }
-    if (!address.prefecture.trim()) {
-      toast.error('都道府県を入力してください');
-      return;
-    }
-    if (!address.city.trim()) {
-      toast.error('市区町村を入力してください');
-      return;
-    }
-    if (!address.street.trim()) {
-      toast.error('番地・建物名を入力してください');
-      return;
-    }
+    // 配送先情報の検証
+    if (!validateAddress(address)) return;
 
-    // 支払い方法に応じたバリデーション
+    // 支払い方法に応じた検証
     if (paymentMethod === 'credit') {
-      const cardNumber = document.querySelector('input[placeholder="1234 5678 9012 3456"]') as HTMLInputElement;
-      const expiry = document.querySelector('input[placeholder="MM/YY"]') as HTMLInputElement;
-      const cvv = document.querySelector('input[placeholder="123"]') as HTMLInputElement;
-      const cardName = document.querySelector('input[placeholder="TARO YAMADA"]') as HTMLInputElement;
-
-      if (!cardNumber?.value) {
-        toast.error('クレジットカード番号を入力してください');
-        return;
-      }
-      if (!expiry?.value) {
-        toast.error('有効期限を入力してください');
-        return;
-      }
-      if (!cvv?.value) {
-        toast.error('セキュリティコードを入力してください');
-        return;
-      }
-      if (!cardName?.value.trim()) {
-        toast.error('カード名義人を入力してください');
-        return;
-      }
-
-      // カード番号のフォーマットチェック
-      if (!/^\d{16}$/.test(cardNumber.value.replace(/\s/g, ''))) {
-        toast.error('有効なクレジットカード番号を入力してください');
-        return;
-      }
-      // 有効期限のフォーマットチェック
-      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry.value)) {
-        toast.error('有効期限は MM/YY の形式で入力してください');
-        return;
-      }
-      // CVVのフォーマットチェック
-      if (!/^\d{3}$/.test(cvv.value)) {
-        toast.error('セキュリティコードは3桁の数字で入力してください');
-        return;
-      }
+      if (!validateCreditCard()) return;
     } else if (paymentMethod === 'bank') {
-      const bankName = document.querySelector('input[placeholder="ヤマダタロウ"]') as HTMLInputElement;
-      const phoneNumber = document.querySelector('input[placeholder="090-1234-5678"]') as HTMLInputElement;
-
-      if (!bankName?.value.trim()) {
-        toast.error('お名前（カタカナ）を入力してください');
-        return;
-      }
-      if (!/^[ァ-ヶー]+$/.test(bankName.value)) {
-        toast.error('お名前はカタカナで入力してください');
-        return;
-      }
-      if (!phoneNumber?.value) {
-        toast.error('電話番号を入力してください');
-        return;
-      }
-      if (!/^0\d{1,4}-\d{1,4}-\d{4}$/.test(phoneNumber.value)) {
-        toast.error('有効な電話番号を入力してください（例：090-1234-5678）');
-        return;
-      }
+      if (!validateBankTransfer()) return;
     }
 
     try {
