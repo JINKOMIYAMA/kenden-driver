@@ -85,29 +85,6 @@ const Payment = () => {
     return errors;
   };
 
-  const handlePostalCodeChange = async (code: string) => {
-    setAddress(prev => ({ ...prev, postalCode: code }));
-    
-    if (code.length === 7) {
-      try {
-        const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${code}`);
-        const data = await response.json();
-        
-        if (data.results) {
-          const result = data.results[0];
-          setAddress(prev => ({
-            ...prev,
-            prefecture: result.address1,
-            city: result.address2 + result.address3,
-            street: ''
-          }));
-        }
-      } catch (error) {
-        console.error('郵便番号の検索に失敗しました:', error);
-      }
-    }
-  };
-
   const handlePayment = async () => {
     const validationErrors = validateForm();
     
