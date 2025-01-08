@@ -112,10 +112,11 @@ const Payment = () => {
     const validationErrors = validateForm();
     
     if (validationErrors.length > 0) {
+      // 各エラーメッセージをtoastで表示
       validationErrors.forEach(error => {
         toast.error(error);
       });
-      return;
+      return; // エラーがある場合は処理を中断
     }
 
     try {
