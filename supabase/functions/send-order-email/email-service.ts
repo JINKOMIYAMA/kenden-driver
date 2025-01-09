@@ -22,11 +22,8 @@ export class EmailService {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Resend API error:', errorText);
-      throw new Error(`Failed to send email: ${errorText}`);
     }
 
-    const result = await response.json();
-    console.log('Email sent successfully:', result);
     return response;
   }
 }
