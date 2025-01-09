@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = "comimasa@icloud.com"; // 管理者のメールアドレスを更新
+const ADMIN_EMAIL = "comimasa@icloud.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,10 +25,6 @@ interface OrderEmailRequest {
   items: OrderItem[];
 }
 
-const formatPrice = (price: number): string => {
-  return `¥${price.toLocaleString()}`;
-};
-
 const generateCustomerEmailHtml = (order: OrderEmailRequest) => {
   const itemsList = order.items
     .map(
@@ -36,7 +32,7 @@ const generateCustomerEmailHtml = (order: OrderEmailRequest) => {
         `<tr>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}個</td>
-          <td style="padding: 10px; border-bottom: 1px solid #eee;">${formatPrice(item.price * item.quantity)}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #eee;">¥${(item.price * item.quantity).toLocaleString()}</td>
         </tr>`
     )
     .join("");
@@ -62,7 +58,7 @@ const generateCustomerEmailHtml = (order: OrderEmailRequest) => {
         <tfoot>
           <tr>
             <td colspan="2" style="padding: 10px; text-align: right;"><strong>合計</strong></td>
-            <td style="padding: 10px;"><strong>${formatPrice(order.totalAmount)}</strong></td>
+            <td style="padding: 10px;"><strong>¥${order.totalAmount.toLocaleString()}</strong></td>
           </tr>
         </tfoot>
       </table>
@@ -87,7 +83,7 @@ const generateAdminEmailHtml = (order: OrderEmailRequest) => {
         `<tr>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
           <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}個</td>
-          <td style="padding: 10px; border-bottom: 1px solid #eee;">${formatPrice(item.price * item.quantity)}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #eee;">¥${(item.price * item.quantity).toLocaleString()}</td>
         </tr>`
     )
     .join("");
@@ -115,7 +111,7 @@ const generateAdminEmailHtml = (order: OrderEmailRequest) => {
         <tfoot>
           <tr>
             <td colspan="2" style="padding: 10px; text-align: right;"><strong>合計</strong></td>
-            <td style="padding: 10px;"><strong>${formatPrice(order.totalAmount)}</strong></td>
+            <td style="padding: 10px;"><strong>¥${order.totalAmount.toLocaleString()}</strong></td>
           </tr>
         </tfoot>
       </table>
@@ -135,11 +131,24 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (!RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is not set");
+    return new Response(
+      JSON.stringify({ error: "RESEND_API_KEY is not configured" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  }
+
   try {
     const orderData: OrderEmailRequest = await req.json();
+    console.log("Received order data:", orderData);
 
-    // 購入者へのメール送信
-    const customerEmailResponse = await fetch("https://api.resend.com/emails", {
+    // Send customer email
+    console.log("Sending customer email to:", orderData.customerEmail);
+    const customerEmailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -153,8 +162,15 @@ const handler = async (req: Request): Promise<Response> => {
       }),
     });
 
-    // 管理者へのメール送信
-    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
+    if (!customerEmailRes.ok) {
+      const error = await customerEmailRes.text();
+      console.error("Failed to send customer email:", error);
+      throw new Error(`Customer email failed: ${error}`);
+    }
+
+    // Send admin email
+    console.log("Sending admin email to:", ADMIN_EMAIL);
+    const adminEmailRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -168,21 +184,29 @@ const handler = async (req: Request): Promise<Response> => {
       }),
     });
 
-    if (!customerEmailResponse.ok || !adminEmailResponse.ok) {
-      throw new Error("Failed to send emails");
+    if (!adminEmailRes.ok) {
+      const error = await adminEmailRes.text();
+      console.error("Failed to send admin email:", error);
+      throw new Error(`Admin email failed: ${error}`);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-  } catch (error) {
-    console.error("Error sending order emails:", error);
     return new Response(
-      JSON.stringify({ error: "Failed to send order confirmation emails" }),
+      JSON.stringify({ message: "Order confirmation emails sent successfully" }),
       {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Error in send-order-email function:", error);
+    return new Response(
+      JSON.stringify({ 
+        error: "Failed to send order confirmation emails",
+        details: error.message 
+      }),
+      {
         status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
   }
