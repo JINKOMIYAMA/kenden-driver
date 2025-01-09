@@ -5,6 +5,7 @@ import { EmailService } from './email-service.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const ADMIN_EMAIL = 'comimasa@icloud.com';
+const IS_DEVELOPMENT = true; // Set this to false in production after domain verification
 
 if (!RESEND_API_KEY) {
   console.error('RESEND_API_KEY is not set');
@@ -24,10 +25,13 @@ const handler = async (req: Request): Promise<Response> => {
     const orderData: OrderEmailRequest = await req.json();
     console.log('Processing order for customer:', orderData.customerName);
 
-    // Send customer confirmation email
+    // In development, send all emails to the admin email to avoid Resend validation error
+    const recipientEmail = IS_DEVELOPMENT ? ADMIN_EMAIL : orderData.customerEmail;
+
+    // Send customer confirmation email (in dev, this goes to admin)
     await emailService.sendEmail({
       from: 'Shop <onboarding@resend.dev>',
-      to: [orderData.customerEmail],
+      to: [recipientEmail],
       subject: 'ご注文ありがとうございます',
       html: generateCustomerEmailHtml(orderData),
     });
