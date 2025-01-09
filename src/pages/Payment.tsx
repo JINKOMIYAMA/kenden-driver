@@ -128,6 +128,34 @@ const Payment = () => {
     return true;
   };
 
+  const sendOrderConfirmationEmails = async (orderData: {
+    customerName: string;
+    customerEmail: string;
+    totalAmount: number;
+    paymentMethod: string;
+    shippingAddress: string;
+    items: Array<{
+      id: string;
+      name: string;
+      price: number;
+      quantity: number;
+    }>;
+  }) => {
+    try {
+      const response = await supabase.functions.invoke('send-order-email', {
+        body: orderData,
+      });
+
+      if (response.error) {
+        console.error('Error sending order emails:', response.error);
+        toast.error('注文確認メールの送信に失敗しました');
+      }
+    } catch (error) {
+      console.error('Error sending order emails:', error);
+      toast.error('注文確認メールの送信に失敗しました');
+    }
+  };
+
   const handlePayment = async () => {
     if (!validateForm()) {
       return;
@@ -155,6 +183,21 @@ const Payment = () => {
         ]);
 
       if (error) throw error;
+
+      // 注文確認メールを送信
+      await sendOrderConfirmationEmails({
+        customerName: customerInfo.name,
+        customerEmail: customerInfo.email,
+        totalAmount: total,
+        paymentMethod,
+        shippingAddress,
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      });
 
       toast.success('ご注文ありがとうございます！');
       clearCart();
