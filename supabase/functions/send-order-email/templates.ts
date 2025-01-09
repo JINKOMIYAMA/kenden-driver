@@ -12,6 +12,21 @@ export const generateCustomerEmailHtml = (order: OrderEmailRequest): string => {
     )
     .join("");
 
+  const bankTransferInfo = order.paymentMethod === 'bank' ? `
+    <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+      <h3 style="margin-top: 0; color: #333;">お振込先情報</h3>
+      <p style="margin: 5px 0;">銀行名：テック銀行</p>
+      <p style="margin: 5px 0;">支店名：渋谷支店（101）</p>
+      <p style="margin: 5px 0;">口座種別：普通</p>
+      <p style="margin: 5px 0;">口座番号：1234567</p>
+      <p style="margin: 5px 0;">口座名義：カ）テックショップ</p>
+      <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+        ※お振込手数料はお客様負担となります。<br>
+        ※お振込みは1週間以内にお願いいたします。
+      </p>
+    </div>
+  ` : '';
+
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <h2>ご注文ありがとうございます</h2>
@@ -43,6 +58,8 @@ export const generateCustomerEmailHtml = (order: OrderEmailRequest): string => {
 
       <h3>お支払い方法</h3>
       <p>${order.paymentMethod === 'credit' ? 'クレジットカード' : '銀行振込'}</p>
+
+      ${bankTransferInfo}
 
       <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
       
